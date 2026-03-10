@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบหมายจับ — Warrant Management System</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzFhNTZkYiIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMCI+4pqWPC90ZXh0Pgo8L3N2Zz4=">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/shared.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     LOGIN
+═══════════════════════════════════════════════════════ -->
+<div id="login">
+  <div class="login-deco-grid"></div>
+  <div class="login-deco-line l1"></div>
+  <div class="login-deco-line l2"></div>
+  <div class="login-deco-circle c1"></div>
+  <div class="login-deco-circle c2"></div>
+  <div class="login-deco-circle c3"></div>
+  <div class="login-deco-ring r1"></div>
+  <div class="login-deco-ring r2"></div>
+  <div class="login-deco-ring r3"></div>
+  <div class="login-deco-badge b1"><div class="badge-dot" style="background:var(--green)"></div><div><div class="badge-text">อนุมัติแล้ว</div><div class="badge-num" style="color:var(--green)">ALLOW</div></div></div>
+  <div class="login-deco-badge b2"><div class="badge-dot" style="background:var(--accent)"></div><div><div class="badge-text">ระบบออนไลน์</div><div class="badge-num" style="color:var(--accent)">LIVE ●</div></div></div>
+  <div class="login-deco-badge b3"><div class="badge-dot" style="background:var(--red)"></div><div><div class="badge-text">ต้องการตัว</div><div class="badge-num" style="color:var(--red)">WANTED</div></div></div>
+  <div class="login-deco-badge b4"><div class="badge-dot" style="background:var(--yellow)"></div><div><div class="badge-text">รอดำเนินการ</div><div class="badge-num" style="color:var(--yellow)">PENDING</div></div></div>
+  <svg class="login-deco-dots d1" width="80" height="80" xmlns="http://www.w3.org/2000/svg"><pattern id="dots1" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="#1a56db"/></pattern><rect width="80" height="80" fill="url(#dots1)"/></svg>
+  <svg class="login-deco-dots d2" width="80" height="80" xmlns="http://www.w3.org/2000/svg"><pattern id="dots2" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="#0e9f6e"/></pattern><rect width="80" height="80" fill="url(#dots2)"/></svg>
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon">⚖</div>
+      <div><div class="brand-name">ระบบหมายจับ</div><div class="brand-sub">WARRANT MANAGEMENT SYSTEM</div></div>
+    </div>
+    <div class="login-title">เข้าสู่ระบบ</div>
+    <div class="login-subtitle">กรุณาใส่ข้อมูลผู้ใช้งานเพื่อเข้าใช้งาน</div>
+    <div class="login-error" id="login-error">⚠ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+    <div class="field"><label>ชื่อผู้ใช้งาน (Username)</label><input type="text" id="username" placeholder="กรอกชื่อผู้ใช้" autocomplete="off"></div>
+    <div class="field"><label>รหัสผ่าน (Password)</label><input type="password" id="password" placeholder="กรอกรหัสผ่าน"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">เข้าสู่ระบบ →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     DASHBOARD SHELL
+═══════════════════════════════════════════════════════ -->
+<div id="dashboard" style="display:none; flex-direction:column; min-height:100vh;">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">⚖</div>
+      <div class="topbar-title">ระบบหมายจับ</div>
+    </div>
+    <div class="topbar-divider"></div>
+    <div class="status-pill"><div class="status-dot"></div>ออนไลน์</div>
+    <div class="status-pill" style="background:var(--accent-lt);color:var(--accent)" id="refresh-countdown" title="รีเฟรชอัตโนมัติทุก 5 นาที">⟳ 5:00</div>
+    <div class="topbar-clock" id="clock">—</div>
+    <div class="topbar-user">
+      <div class="avatar" id="avatar-letter">A</div>
+      <span id="topbar-username"></span>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
+  </div>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="nav-label">เมนูหลัก</div>
+      <div class="nav-item" data-view="overview" onclick="navigateTo('overview')"><span class="nav-icon">▦</span>ภาพรวม</div>
+      <div class="nav-item" data-view="warrants" onclick="navigateTo('warrants')"><span class="nav-icon">📋</span>รายการหมายจับ</div>
+      <div class="nav-item" data-view="upload"   onclick="navigateTo('upload')"  ><span class="nav-icon">📤</span>อัปโหลดข้อมูล</div>
+      <div class="nav-label">กรองสถานะ</div>
+      <div class="nav-item" onclick="quickFilter('cmd','ALLOW')">   <span class="nav-icon" style="color:var(--green)">●</span>อนุมัติ (ALLOW)</div>
+      <div class="nav-item" onclick="quickFilter('cmd','PENDING')"> <span class="nav-icon" style="color:var(--yellow)">●</span>รอดำเนินการ</div>
+      <div class="nav-item" onclick="quickFilter('cmd','DENY')">    <span class="nav-icon" style="color:var(--red)">●</span>ปฏิเสธ (DENY)</div>
+      <div class="nav-item" onclick="quickFilter('type','WANTED')"> <span class="nav-icon" style="color:var(--red)">🔴</span>ต้องการตัว</div>
+      <div class="nav-item" onclick="quickFilter('arrest','NOT')">  <span class="nav-icon" style="color:var(--slate)">○</span>ยังไม่จับ (NOT)</div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main">
+
+      <!-- ── OVERVIEW ── -->
+      <div id="view-overview" style="display:none">
+        <div class="page-header">
+          <div><div class="page-title">ภาพรวมระบบ</div><div class="page-sub">ข้อมูลหมายจับทั้งหมดจาก API</div></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div class="api-badge loading" id="api-indicator">⟳ กำลังโหลด...</div>
+            <button class="btn btn-primary" onclick="manualRefresh()">↻ รีเฟรช</button>
+          </div>
+        </div>
+        <div class="welcome-banner">
+          <div class="welcome-banner-bg"></div><div class="welcome-banner-g1"></div><div class="welcome-banner-g2"></div>
+          <div class="welcome-banner-inner">
+            <div>
+              <div class="welcome-title">ยินดีต้อนรับ, <span id="banner-username"></span> 👋</div>
+              <div class="welcome-sub">ระบบติดตามและบริหารจัดการหมายจับ — Warrant Management System</div>
+            </div>
+            <div class="welcome-stats">
+              <div class="welcome-stat"><div class="welcome-stat-val" style="color:#fff"        id="banner-total">—</div><div class="welcome-stat-lbl">รายการทั้งหมด</div></div>
+              <div class="welcome-stat"><div class="welcome-stat-val" style="color:#6ee7b7"     id="banner-allow">—</div><div class="welcome-stat-lbl">ALLOW</div></div>
+              <div class="welcome-stat"><div class="welcome-stat-val" style="color:#fca5a5"     id="banner-not">—</div>  <div class="welcome-stat-lbl">ยังไม่จับ</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card blue">  <div class="stat-header"><div class="stat-label">หมายจับทั้งหมด</div>    <div class="stat-icon">📁</div></div><div class="stat-value" id="stat-total">—</div>  <div class="stat-delta">รายการทั้งหมด</div></div>
+          <div class="stat-card green"> <div class="stat-header"><div class="stat-label">อนุมัติ (ALLOW)</div>   <div class="stat-icon">✅</div></div><div class="stat-value" id="stat-allow">—</div>  <div class="stat-delta">command_status = ALLOW</div></div>
+          <div class="stat-card yellow"><div class="stat-header"><div class="stat-label">ต้องการตัว (WANTED)</div><div class="stat-icon">🔍</div></div><div class="stat-value" id="stat-wanted">—</div><div class="stat-delta">warrant_type = WANTED</div></div>
+          <div class="stat-card red">   <div class="stat-header"><div class="stat-label">ยังไม่จับ (NOT)</div>   <div class="stat-icon">⚠️</div></div><div class="stat-value" id="stat-not">—</div>   <div class="stat-delta">arrest_status = NOT</div></div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-panel"><div class="chart-title">สถานะคำสั่ง</div><div class="chart-sub">Command Status breakdown</div><div class="chart-wrap"><canvas id="chart-cmd"></canvas></div></div>
+          <div class="chart-panel"><div class="chart-title">สถานะการจับกุม</div><div class="chart-sub">Arrest Status breakdown</div><div class="chart-wrap"><canvas id="chart-arrest"></canvas></div></div>
+          <div class="chart-panel"><div class="chart-title">ข้อหาที่พบบ่อย</div><div class="chart-sub">Top allegations by count</div><div class="chart-wrap tall"><canvas id="chart-allegations"></canvas></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div><div class="panel-title">รายการล่าสุด</div><div class="panel-sub">หมายจับ 6 รายการล่าสุด</div></div>
+            <button class="btn btn-outline" onclick="navigateTo('warrants')">ดูทั้งหมด →</button>
+          </div>
+          <div id="ov-loading" style="display:none"><div class="loading-bar"><div class="loading-bar-fill"></div></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>เลขหมาย</th><th>ชื่อ-สกุล</th><th>ศาล</th><th>ข้อหา</th><th>สถานะคำสั่ง</th><th>สถานะจับ</th><th></th></tr></thead>
+              <tbody id="overview-tbody"><tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div>กำลังโหลด...</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── WARRANTS ── -->
+      <div id="view-warrants" style="display:none">
+        <div class="page-header">
+          <div><div class="page-title">รายการหมายจับ</div><div class="page-sub">ข้อมูลทั้งหมดพร้อมฟิลเตอร์และการค้นหา</div></div>
+          <button class="btn btn-primary" onclick="manualRefresh()">↻ รีเฟรชข้อมูล</button>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div><div class="panel-title">หมายจับทั้งหมด</div><div class="panel-sub" id="warrant-count">0 รายการ</div></div>
+            <button class="btn btn-outline" onclick="exportCSV()">↓ ส่งออก CSV</button>
+          </div>
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input class="search-input" id="search-box" placeholder="ค้นหาชื่อ, เลขหมาย, เลขบัตร..." oninput="filterTable()">
+            </div>
+            <select class="filter-select" id="cmd-filter"    onchange="filterTable()"><option value="">ทุกสถานะคำสั่ง</option><option value="ALLOW">ALLOW</option><option value="PENDING">PENDING</option><option value="DENY">DENY</option></select>
+            <select class="filter-select" id="arrest-filter" onchange="filterTable()"><option value="">ทุกสถานะจับ</option><option value="NOT">NOT</option><option value="ARRESTED">ARRESTED</option></select>
+            <select class="filter-select" id="type-filter"   onchange="filterTable()"><option value="">ทุกประเภทหมาย</option><option value="WANTED">WANTED</option></select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th onclick="sortTable('no')">เลขหมาย ↕</th>
+                <th onclick="sortTable('suspect_fullname')">ชื่อ-สกุล ↕</th>
+                <th onclick="sortTable('suspect_idcard')">เลขบัตร / Passport ↕</th>
+                <th onclick="sortTable('court_name')">ศาล ↕</th>
+                <th onclick="sortTable('allegations')">ข้อหา ↕</th>
+                <th onclick="sortTable('command_status')">สถานะคำสั่ง ↕</th>
+                <th onclick="sortTable('arrest_status')">สถานะจับ ↕</th>
+                <th onclick="sortTable('warrant_type')">ประเภทหมาย ↕</th>
+                <th>รายละเอียด</th>
+              </tr></thead>
+              <tbody id="warrants-tbody"><tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📋</div>กำลังโหลด...</div></td></tr></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span id="page-info">—</span>
+            <div class="page-btns" id="page-btns"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── UPLOAD ── -->
+      <div id="view-upload" style="display:none">
+        <div class="page-header">
+          <div><div class="page-title">อัปโหลดข้อมูล</div><div class="page-sub">อัปเดตสถานะหมายจับผ่านไฟล์ Excel / CSV</div></div>
+        </div>
+        <div class="panel" style="max-width:700px">
+          <div class="panel-header"><div class="panel-title">อัปโหลดไฟล์ Excel / CSV</div></div>
+          <div class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)" onclick="document.getElementById('file-input').click()">
+            <input type="file" class="upload-input" id="file-input" accept=".xlsx,.xls,.csv" onchange="handleFile(event)">
+            <div class="upload-icon-big">📊</div>
+            <div class="upload-title">ลากวางไฟล์ หรือคลิกเพื่อเลือก</div>
+            <div class="upload-sub">รองรับไฟล์ .xlsx, .xls, .csv</div>
+          </div>
+          <div class="upload-progress" id="upload-progress">
+            <div class="progress-header"><span id="progress-text">กำลังประมวลผล...</span><span id="progress-pct">0%</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          </div>
+          <div class="upload-result" id="upload-result"></div>
+          <div class="format-guide">
+            <div class="format-guide-title">📌 รูปแบบคอลัมน์ที่รองรับ</div>
+            <div class="format-row"><span class="format-key">no</span>               <span class="format-desc">เลขที่หมาย เช่น 73/2566</span></div>
+            <div class="format-row"><span class="format-key">suspect_fullname</span> <span class="format-desc">ชื่อ-สกุลผู้ต้องหา</span></div>
+            <div class="format-row"><span class="format-key">suspect_idcard</span>   <span class="format-desc">เลขบัตรประชาชน 13 หลัก หรือ Passport</span></div>
+            <div class="format-row"><span class="format-key">court_name</span>       <span class="format-desc">ชื่อศาล</span></div>
+            <div class="format-row"><span class="format-key">black_case_no / red_case_no</span><span class="format-desc">เลขคดีดำ / แดง</span></div>
+            <div class="format-row"><span class="format-key">allegations</span>      <span class="format-desc">ข้อหา</span></div>
+            <div class="format-row"><span class="format-key">command_status</span>   <span class="format-desc">ALLOW / PENDING / DENY</span></div>
+            <div class="format-row"><span class="format-key">arrest_status</span>    <span class="format-desc">NOT / ARRESTED</span></div>
+            <div class="format-row"><span class="format-key">warrant_type</span>     <span class="format-desc">WANTED / ฯลฯ</span></div>
+          </div>
+        </div>
+        <div class="panel" id="preview-panel" style="display:none;max-width:1000px">
+          <div class="panel-header">
+            <div><div class="panel-title">ตัวอย่างข้อมูล (10 แถวแรก)</div></div>
+            <button class="btn btn-green" onclick="applyUpload()">✓ นำเข้าสู่ Dashboard</button>
+          </div>
+          <div class="table-wrap"><table><thead id="preview-thead"></thead><tbody id="preview-tbody"></tbody></table></div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /dashboard -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">รายละเอียดหมายจับ</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Scripts — order matters -->
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/router.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/overview.js"></script>
+<script src="js/warrants.js"></script>
+<script src="js/upload.js"></script>
+
+<script>
+  // Start clock once dashboard is visible
+  startClock();
+
+  // Countdown timer display
+  setInterval(() => {
+    const el = document.getElementById('refresh-countdown');
+    if (!el) return;
+    const s = secondsUntilRefresh();
+    if (s === null) return;
+    const m = Math.floor(s / 60);
+    const sec = String(s % 60).padStart(2, '0');
+    el.textContent = `⟳ ${m}:${sec}`;
+  }, 1000);
+</script>
+</body>
+</html>
