@@ -10,6 +10,9 @@ function navigateTo(view) {
   });
   highlightNav(view);
 
+  // Scroll to top on navigation
+  document.querySelector('.main').scrollTop = 0;
+
   // Init the view
   if      (view === 'overview') initOverview();
   else if (view === 'warrants') initWarrants();

@@ -6,7 +6,8 @@ function startClock() {
 
 // ── Nav highlight ──────────────────────────────────────────
 function highlightNav(page) {
-  document.querySelectorAll('.nav-item').forEach(el => {
+  // Desktop sidebar + mobile bottom nav
+  document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === page);
   });
 }

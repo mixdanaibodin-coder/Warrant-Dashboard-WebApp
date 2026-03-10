@@ -61,3 +61,34 @@
 
 @media(max-width:1100px) { .charts-grid { grid-template-columns:1fr 1fr; } }
 @media(max-width:900px)  { .stats-grid  { grid-template-columns:repeat(2,1fr); } }
+
+@media(max-width:768px) {
+  /* Stats 2 columns on mobile */
+  .stats-grid { grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-value { font-size: 24px; }
+  .stat-card  { padding: 14px 16px; }
+
+  /* Charts single column */
+  .charts-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px; }
+  .chart-wrap  { height: 180px; }
+  .chart-wrap.tall { height: 220px; }
+
+  /* Welcome banner compact */
+  .welcome-banner { padding: 16px 18px; margin-bottom: 16px; }
+  .welcome-title  { font-size: 15px; }
+  .welcome-sub    { display: none; }
+  .welcome-stats  { gap: 6px; }
+  .welcome-stat   { padding: 6px 12px; }
+  .welcome-stat-val { font-size: 16px; }
+
+  /* Upload zone compact */
+  .upload-zone { padding: 32px 16px; margin: 12px; }
+  .upload-icon-big { font-size: 32px; }
+  .format-guide { margin: 0 12px 12px; }
+  .format-key   { width: 140px; font-size: 11px; }
+  .format-desc  { font-size: 11px; }
+
+  /* Login card full width */
+  .login-card { width: 92vw; padding: 32px 24px; }
+  .login-deco-badge { display: none; }
+}
